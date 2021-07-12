@@ -1,33 +1,76 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 /// Modifica el componente para que se puedan agregar tareas, tachar y destacharlas y error de validacion en el input
-
+const initialState = [
+  { id: 1, name: "Sacar la ropa", done: false },
+  { id: 2, name: "Hacer la cama", done: false },
+  { id: 3, name: "Leer un rato", done: false },
+];
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      tasks: [
-        { id: 1, name: "Sacar la ropa", done: false },
-        { id: 2, name: "Hacer la cama", done: true },
-        { id: 3, name: "Leer un rato", done: false }
-      ],
-      newTask: ''
+  state = {
+    initialState,
+    newTask: "",
+    id: 4,
+    done: false,
+  };
+
+  handleChange = (e) => {
+    this.setState({
+      newTask: e.target.value,
+    });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const { newTask, id, done } = this.state;
+    this.setState((prevState) => (
+      {
+        initialState: [...this.state.initialState, { name: newTask, id: id , done }],
+        newTask: '',
+        id: prevState.id + 1
+      }
+    ));
+  };
+
+  handleKeyPress = (e) => {
+    if (e.keyCode === 13) {
+      this.handleSubmit()
     }
+  };
+
+  handleClick = (e) => {
+    e.preventDefault()
+    if(e.currentTarget.className === ''){
+      e.currentTarget.className = 'done'
+      } else if(e.currentTarget.className === 'done'){
+        e.currentTarget.className = ''
+     }
   }
+
   render() {
     return (
       <div className="wrapper">
         <div className="list">
           <h3>Por hacer:</h3>
           <ul className="todo">
-            {this.state.tasks.map((task, index) => <li key={task.id}>{task.name}</li>)}
+            {this.state.initialState.map((task, index) => (
+              <li key={task.id} onClick={this.handleClick}>{task.name}</li>
+            ))}
           </ul>
-          <form>
-            <input type="text" id="new-task" placeholder="Ingresa una tarea y oprime Enter" value={this.state.newTask} />
+          <form onSubmit={this.handleSubmit}>
+            <input
+              type="text"
+              id="new-task"
+              placeholder="Ingresa una tarea y oprime Enter"
+              onChange={this.handleChange}
+              onKeyPress={this.handleKeyPress}
+              value={this.state.newTask}
+              className={this.newTask ? '' : 'error'}
+            />
           </form>
         </div>
       </div>
-    )
+    );
   }
 }
 
