@@ -3,16 +3,19 @@ import React, { Component } from "react";
 /// Modifica el componente para que se puedan agregar tareas, tachar y destacharlas y error de validacion en el input
 const initialState = [
   { id: 1, name: "Sacar la ropa", done: false },
-  { id: 2, name: "Hacer la cama", done: false },
+  { id: 2, name: "Hacer la cama", done: true },
   { id: 3, name: "Leer un rato", done: false },
 ];
 class App extends Component {
-  state = {
-    initialState,
-    newTask: "",
-    id: 4,
-    done: false,
-  };
+  constructor(){
+    super()
+    this.state = {
+      initialState,
+      newTask: "",
+      id: 4,
+      done: false,
+    };
+  }
 
   handleChange = (e) => {
     this.setState({
@@ -23,29 +26,33 @@ class App extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     const { newTask, id, done } = this.state;
-    this.setState((prevState) => (
-      {
-        initialState: [...this.state.initialState, { name: newTask, id: id , done }],
-        newTask: '',
-        id: prevState.id + 1
-      }
-    ));
+    this.setState((prevState) => ({
+      initialState: [
+        ...this.state.initialState,
+        { name: newTask, id: id, done },
+      ],
+      newTask: "",
+      id: prevState.id + 1,
+    }));
   };
 
   handleKeyPress = (e) => {
     if (e.keyCode === 13) {
-      this.handleSubmit()
+      this.handleSubmit();
     }
   };
 
-  handleClick = (e) => {
-    e.preventDefault()
-    if(e.currentTarget.className === ''){
-      e.currentTarget.className = 'done'
-      } else if(e.currentTarget.className === 'done'){
-        e.currentTarget.className = ''
-     }
-  }
+  handleClick = (taskId) => {
+    const newTask = this.state.initialState.map( task => {
+      if(taskId === task.id){
+        task.done = !task.done
+      } 
+      return task
+    })
+    this.setState({
+      initialState: [...newTask]
+    })
+  };
 
   render() {
     return (
@@ -54,7 +61,9 @@ class App extends Component {
           <h3>Por hacer:</h3>
           <ul className="todo">
             {this.state.initialState.map((task, index) => (
-              <li key={task.id} onClick={this.handleClick}>{task.name}</li>
+              <li key={task.id} onClick={() => this.handleClick(task.id)} className={task.done ? 'done' : ''}>
+                {task.name}
+              </li>
             ))}
           </ul>
           <form onSubmit={this.handleSubmit}>
@@ -65,7 +74,7 @@ class App extends Component {
               onChange={this.handleChange}
               onKeyPress={this.handleKeyPress}
               value={this.state.newTask}
-              className={this.newTask ? '' : 'error'}
+              className={this.newTask ? "" : "error"}
             />
           </form>
         </div>
